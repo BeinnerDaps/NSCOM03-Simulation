@@ -108,13 +108,13 @@ m = input("Enter input signal:  ")
 while set(m).issubset({'0', '1'}) is False or len(list(m)) < 8:
     print("Error: Linecode should be atleast 8-bit binary")
     m = input("Enter linecode: ")
-m = np.array(list(map(int, m)))
 
-choose = input("Choose input signal (ASK/FSK): ")
+choose = input("Choose input signal {ASK/FSK}: ")
 while choose not in ('ASK', 'FSK'):
     print("Error: Signals should be ASK or FSK")
     choose = input("Choose input signal: (ASK/FSK)")
 
+m = np.array(list(map(int, m)))
 if choose == "ASK":
     ASK(m)
 elif choose == "FSK":
