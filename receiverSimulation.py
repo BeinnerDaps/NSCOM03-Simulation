@@ -59,7 +59,7 @@ def ASK_demod(fc,Tb,rate,ask_signal):
         plt.grid(True)
 
     m = np.array(m)
-    print(m)
+    print(f'ASK: {m}')
 
     # Plotting carrier signal
     plt.subplot(2,1,1)
@@ -96,7 +96,7 @@ def FSK_demod(fc,Tb,rate,fsk_signal):
         plt.grid(True)
 
     m = np.array(m)
-    print(m)
+    print(f'FSK: {m}')
 
     # Plotting carrier signals
     plt.subplot(3,1,1)
