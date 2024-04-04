@@ -48,13 +48,21 @@ def FSK_mod(m):
     transmit_message("FSK", fc, Tb, rate, fsk_signal)
 
 def transmit_message(sig,fc, Tb, rate, mod_sig):
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        HOST = socket.gethostbyname(socket.gethostname())
-        PORT = 12345
-        s.connect((HOST, PORT))
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    hostname = socket.gethostname()
+    HOST = socket.gethostbyname(hostname)
+    PORT = 12345
+    s.connect((HOST, PORT))
+
+    try:
         send = [sig,fc,Tb,rate,mod_sig]
         send_pickle = pickle.dumps(send)
-        s.sendall(len(send_pickle).to_bytes(4,'big') + send_pickle)
+        buffer = len(send_pickle).to_bytes(4,'big')
+        s.sendall(buffer + send_pickle)
+        print(f"{sig} message sent")
+    except socket.error as e:
+        print(f"An error occurred: {e}")
+    finally:
         s.close()
 
 m = input("Enter input signal:  ")
@@ -68,8 +76,6 @@ while choose not in ('ASK', 'FSK'):
     choose = input("Choose input signal: (ASK/FSK)")
 
 m = np.array(list(map(int, m)))
-if choose == "ASK":
-    ASK_mod(m)
-elif choose == "FSK":
-    FSK_mod(m)
+if choose == "ASK": ASK_mod(m)
+elif choose == "FSK": FSK_mod(m)
 

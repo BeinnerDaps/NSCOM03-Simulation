@@ -4,39 +4,40 @@ import matplotlib.pyplot as plt
 import socket
 
 def receive_message():
-    array = []
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        HOST = socket.gethostbyname(socket.gethostname())
-        PORT = 12345
-        s.bind((HOST, PORT))
-        s.listen(1)
-        print(f"Listening on {HOST}:{PORT}")
-        conn, addr = s.accept()
-        with conn:
-            print(f"Connected by {addr}")
-            while True:
-                try:
-                    data = conn.recv(4)
-                    if not data:
-                        break
-                    data_len = int.from_bytes(data, 'big')
-                    received = b''
-                    while len(received) < data_len:
-                        chunk = conn.recv(data_len-len(received))
-                        if not chunk:
-                            raise ValueError("Could not complete transfer")
-                        received += chunk
-                    array.extend(pickle.loads(received))
-                except EOFError as e:
+    arr = []
+    s =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    hostname = socket.gethostname()
+    HOST = socket.gethostbyname(hostname)
+    PORT = 12345
+    s.bind((HOST, PORT))
+    s.listen(1)
+    print(f"Listening on {HOST}:{PORT}")
+
+    conn, addr = s.accept()
+    with conn:
+        print(f"Connected by {addr}")
+        while True:
+            try:
+                data = conn.recv(4)
+                if not data:
                     break
-                except Exception as e:
+                d_len = int.from_bytes(data,'big')
+                received = b''
+                while len(received) < d_len:
+                    chunk = d_len-len(received)
+                    received += conn.recv(chunk)
+                arr.extend(pickle.loads(received))
+            except EOFError as e:
+                    break
+            except Exception as e:
                     print(f"Exception:{e}")
                     break
+    s.close()
 
-        if array[0] == "ASK":
-            ASK_demod(array[1],array[2],array[3],array[4])
-        elif array[0] == "FSK":
-            FSK_demod(array[1],array[2],array[3],array[4])
+    if arr[0] == "ASK":
+        ASK_demod(arr[1],arr[2],arr[3],arr[4])
+    elif arr[0] == "FSK":
+        FSK_demod(arr[1],arr[2],arr[3],arr[4])
 
 def ASK_demod(fc,Tb,rate,ask_signal):
     m,c = [],[]
@@ -47,7 +48,7 @@ def ASK_demod(fc,Tb,rate,ask_signal):
     for i in range(N):
         t = np.arange(i*Tb, (i+1)*Tb, Tb/rate)
         sig = ask_signal[i,:]*c
-        m.append(1) if sum(sig) > max(sig) else m.append(0)
+        m += [1] if sum(sig) > max(sig) else [0]
 
         #Plot ASK signal
         plt.figure("ASK", figsize=(10, 7))
@@ -84,7 +85,9 @@ def FSK_demod(fc,Tb,rate,fsk_signal):
         segment = fsk_signal[i,:]
         co1 = segment * c1[:len(segment)]
         co0 = segment * c2[:len(segment)]
-        m.append(1) if np.sum(co1) > np.sum(co0) else m.append(0)
+        sum1 = np.sum(co1)
+        sum0 = np.sum(co0)
+        m += [1] if  sum1 > sum0 else [0]
 
         # Plot FSK signal
         plt.figure("ASK", figsize=(10, 7))
