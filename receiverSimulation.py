@@ -57,12 +57,10 @@ def ASK_demod(fc,Tb,rate,ask_signal):
         #Plot ASK signal
         plt.figure("ASK", figsize=(10, 7))
         plt.subplot(2,1,2)
-        plt.plot(t, ask_signal[i,:])
+        plt.plot(t, ask_signal[i,:], color='#3684BB' if m[-1] == 1 else 'orange')
         plt.title('ASK signal')
         plt.xlabel('t--->')
         plt.ylabel('s(t)')
-        plt.fill_between(t, ask_signal[i,:], where=ask_signal[i,:] > 0, color='green', step='pre')
-        plt.fill_between(t, 0, where=ask_signal[i,:] <= 0, color='red', step='pre')
         plt.grid(True)
 
     m = np.array(m)
@@ -70,7 +68,7 @@ def ASK_demod(fc,Tb,rate,ask_signal):
 
     # Plotting carrier signal
     plt.subplot(2,1,1)
-    plt.plot(t, c)
+    plt.plot(t, c, color='#3684BB')
     plt.title('carrier signal')
     plt.xlabel('t--->')
     plt.ylabel('c(t)')
@@ -98,7 +96,7 @@ def FSK_demod(fc,Tb,rate,fsk_signal):
         # Plot FSK signal
         plt.figure("ASK", figsize=(10, 7))
         plt.subplot(3,1,3)
-        plt.plot(t,fsk_signal[i,:])
+        plt.plot(t,fsk_signal[i,:], color='#3684BB' if m[-1] == 1 else 'orange')
         plt.title('FSK signal')
         plt.xlabel('t---->')
         plt.ylabel('s(t)')
@@ -109,14 +107,14 @@ def FSK_demod(fc,Tb,rate,fsk_signal):
 
     # Plotting carrier signals
     plt.subplot(3,1,1)
-    plt.plot(t, c1)
+    plt.plot(t, c1, color='#3684BB')
     plt.title('carrier signal-1')
     plt.xlabel('t---->')
     plt.ylabel('c1(t)')
     plt.grid(True)
 
     plt.subplot(3,1,2)
-    plt.plot(t, c2)
+    plt.plot(t, c2,color='orange')
     plt.title('carrier signal-2')
     plt.xlabel('t---->')
     plt.ylabel('c2(t)')
