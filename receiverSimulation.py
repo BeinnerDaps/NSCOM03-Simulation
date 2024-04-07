@@ -11,33 +11,37 @@ def receive_message():
     PORT = 12345
     s.bind((HOST, PORT))
     s.listen(1)
+    s.settimeout(100.0)
     print(f"Listening on {HOST}:{PORT}")
-
-    conn, addr = s.accept()
-    with conn:
-        print(f"Connected by {addr}")
-        while True:
-            try:
-                data = conn.recv(4)
-                if not data:
-                    break
-                d_len = int.from_bytes(data,'big')
-                received = b''
-                while len(received) < d_len:
-                    chunk = d_len-len(received)
-                    received += conn.recv(chunk)
-                arr.extend(pickle.loads(received))
-            except EOFError as e:
-                    break
-            except Exception as e:
-                    print(f"Exception:{e}")
-                    break
-    s.close()
-
-    if arr[0] == "ASK":
-        ASK_demod(arr[1],arr[2],arr[3],arr[4])
-    elif arr[0] == "FSK":
-        FSK_demod(arr[1],arr[2],arr[3],arr[4])
+    try:
+        conn, addr = s.accept()
+        with conn:
+            print(f"Connected by {addr}")
+            while True:
+                try:
+                    data = conn.recv(4)
+                    if not data:
+                        break
+                    d_len = int.from_bytes(data,'big')
+                    received = b''
+                    while len(received) < d_len:
+                        chunk = d_len-len(received)
+                        received += conn.recv(chunk)
+                    arr.extend(pickle.loads(received))
+                except EOFError as e:
+                        break
+                except Exception as e:
+                        print(f"Exception:{e}")
+                        break
+    except socket.timeout:
+        print("Connection timeout")
+    finally:
+        s.close()
+    if arr:
+        if arr[0] == "ASK":
+            ASK_demod(arr[1],arr[2],arr[3],arr[4])
+        elif arr[0] == "FSK":
+            FSK_demod(arr[1],arr[2],arr[3],arr[4])
 
 def ASK_demod(fc,Tb,rate,ask_signal):
     m,c = [],[]
@@ -57,6 +61,8 @@ def ASK_demod(fc,Tb,rate,ask_signal):
         plt.title('ASK signal')
         plt.xlabel('t--->')
         plt.ylabel('s(t)')
+        plt.fill_between(t, ask_signal[i,:], where=ask_signal[i,:] > 0, color='green', step='pre')
+        plt.fill_between(t, 0, where=ask_signal[i,:] <= 0, color='red', step='pre')
         plt.grid(True)
 
     m = np.array(m)

@@ -1,4 +1,3 @@
-# ASK
 import pickle
 import numpy as np
 import matplotlib.pyplot as plt
@@ -73,7 +72,7 @@ while set(m).issubset({'0', '1'}) is False:
 choose = input("Choose input signal {ASK/FSK}: ")
 while choose not in ('ASK', 'FSK'):
     print("Error: Signals should be ASK or FSK")
-    choose = input("Choose input signal: (ASK/FSK)")
+    choose = input("Choose input signal {ASK/FSK}: ")
 
 m = np.array(list(map(int, m)))
 if choose == "ASK": ASK_mod(m)
